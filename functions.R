@@ -4,9 +4,15 @@
 
 
 #' eq_clean_data
-
-### tests
-data = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#'
+#' loads earthquake data.
+#'
+#' @param filename Name of the file containing earthquake data
+#' @return Returns earthquake data with the following cleaning -a- added 01 for
+#' empty months and days -b- removed dates in bc -c- created a DATE column with
+#' date format -d- turned long and lat to numerics
+#' @examples
+#' eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 
 
 eq_clean_data <- function(filename){
