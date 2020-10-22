@@ -47,3 +47,48 @@ eq_clean_data <- function(filename){
 }
 
 
+
+
+#' eq_location_clean
+#'
+#' cleans location column
+#'
+#' @param data the data that is returned from eq_clean_data
+#' @return returns a data file where location is -a- trimmed of ws -b- converted
+#' to title case -c- name of country removed
+#' @importFrom stringr str_to_title
+#' @examples
+#' eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv"))
+
+
+eq_location_clean <- function(data){
+  # remove everything before colon
+  data$Location.Name <- gsub(".*:","",data$Location.Name)
+  #convert to title case & trim white space
+  data$Location.Name <- stringr::str_to_title(trimws(data$Location.Name))
+
+  return(data)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
