@@ -2,8 +2,6 @@
 # Course - Mastering Software Development in R Capstone
 # Last Edited 20/10/2020
 
-xxx <- eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv"))
-
 ### eq_clean_data --------------------------------------------------------------
 
 #' eq_clean_data
@@ -15,36 +13,32 @@ xxx <- eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.ts
 #' @examples
 #' eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 
-
-eq_clean_data <- function(filename){
-  #check if file name exists
-  if(!file.exists(filename))
-    stop("file '", filename, "' does not exist")
-
-  #read the data
-  data = read.table(file = filename, sep = '\t', header = TRUE)
+eq_clean_data <- function(earthquakes) {
 
   #delete first row - empty result - and first column - empty col
-  data = data[-1, -1]
+  earthquakes = earthquakes[-1, -1]
+
+  result <- data.frame(earthquakes)
 
   #fill empty data data
-  data$Mo[is.na(data$Mo)] = 01
-  data$Dy[is.na(data$Dy)] = 01
-
+  result$Mo[is.na(data$Mo)] = 01
+  result$Dy[is.na(data$Dy)] = 01
+  result$Year[is.na(data$Year)] = 01
   #create date column
-  data$DATE = as.POSIXct(strptime(paste(data$Year,
-                                   data$Mo,
-                                   data$Dy,
-                                   sep="-"), "%Y-%m-%d"))
+  result$DATE = as.POSIXct(strptime(paste(result$Year,
+                                          result$Mo,
+                                          result$Dy,
+                                        sep="-"), "%Y-%m-%d"))
 
   # filter out BC
-  data = data[!is.na(data$DATE), ]
+  result = result[!is.na(result$DATE), ]
 
-  # turn LAT and LONG into numeric
-  data$Longitude = as.numeric(data$Longitude)
-  data$Latitude = as.numeric(data$Latitude)
-
-  return(data)
+  LATITUDE <- as.numeric(result$Latitude)
+  result$LONGITUDE <- as.numeric(result$Longitude)
+  result$TOTAL_DEATHS <- as.numeric(result$Total.Deaths)
+  result$LOCATION_NAME <- eq_location_clean(result$Location.Name)
+  result$COUNTRY <- eq_country_clean(result$Location.Name)
+  result
 }
 
 ### eq_location_clean ----------------------------------------------------------
@@ -58,59 +52,152 @@ eq_clean_data <- function(filename){
 #' @examples
 #' eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv"))
 
-eq_location_clean <- function(data){
-  # remove everything before colon
-  data$Location.Name <- gsub(".*:","",data$Location.Name)
-  #convert to title case & trim white space
-  data$Location.Name <- stringr::str_to_title(trimws(data$Location.Name))
+eq_location_clean <- function(location) {
+  location = gsub(".*:","",location)
+  location = stringr::str_to_title(trimws(location))
+  return(location)
+}
 
-  return(data)
+eq_country_clean <- function(location) {
+  location = gsub(":.*","",location)
+  location = stringr::str_to_title(trimws(location))
+  return(location)
 }
 
 ### geom_timeline --------------------------------------------------------------
 
+geom_timeline <-
+  function(mapping = NULL,
+           data = NULL,
+           stat = "identity",
+           position = "identity",
+           na.rm = FALSE,
+           show.legend = NA,
+           inherit.aes = TRUE,
+           ...) {
+    ggplot2::layer(
+      geom = GeomTimeline,
+      mapping = mapping,
+      data = data,
+      stat = stat,
+      position = position,
+      show.legend = show.legend,
+      inherit.aes = inherit.aes,
+      params = list(na.rm = na.rm, ...)
+    )
+  }
 
-geom_timeline<- function(mapping = NULL, data = NULL, stat = "identity",
-                         position = "identity", na.rm = FALSE,
-                         show.legend = NA, inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    geom = GeomTimeline, mapping = mapping,
-    data = data, stat = stat, position = position,
-    show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
-
-GeomTimeline <- ggplot2::ggproto("GeomTimeline", ggplot2::Geom,
-                                 required_aes = c("x"),
-                                 default_aes = ggplot2::aes(y = 0, colour = "grey", size = 1,
-                                                            alpha = 0.5, shape = 20, fill = NA, stroke = 1),
-                                 draw_key = ggplot2::draw_key_point,
-                                 draw_panel = function(data, panel_scales, coord) {
-
-                                   coords <- coord$transform(data, panel_scales)
-                                   grid::gList(
-                                     grid::pointsGrob(x = coords$x, y= coords$y,
-                                                      pch = coords$shape,
-                                                      gp = grid::gpar(col = alpha(coords$colour, coords$alpha),
-                                                                      fill = alpha(coords$fill, coords$alpha),
-                                                                      fontsize = coords$size * .pt + coords$stroke * .stroke / 2,
-                                                                      lwd = coords$stroke * .stroke / 2)
-                                     ),
-                                     grid::segmentsGrob(x0=min(coords$x), y0= coords$y, x1 = max(coords$x), y1 = coords$y,
-                                                        gp = grid::gpar(col = "blue", lwd = 1))
-                                   )
-                                 }
+GeomTimeline <- ggplot2::ggproto(
+  "GeomTimeline",
+  ggplot2::Geom,
+  required_aes = c("x", "y"),
+  non_missing_aes = c("size", "shape", "color"),
+  default_aes = ggplot2::aes(
+    shape = 19,
+    color = "black",
+    size = 1.5,
+    alpha = NA,
+    fill = NA,
+    stroke = 0.5
+  ),
+  draw_key = ggplot2::draw_key_point,
+  draw_panel = function(data, panel_scales, coord) {
+    coords <- coord$transform(data, panel_scales)
+    grid::grobTree(
+      grid::segmentsGrob(
+        x0 = 0.0,
+        y0 = coords$y,
+        x1 = 1.0,
+        y1 = coords$y,
+        gp = grid::gpar(col = "grey")
+      ),
+      grid::pointsGrob(
+        x = coords$x,
+        y = coords$y,
+        pch = coords$shape,
+        gp = grid::gpar(
+          col = alpha(coords$colour, coords$alpha),
+          fill = alpha(coords$fill, coords$alpha),
+          fontsize = coords$size * .pt + coords$stroke * .stroke / 2,
+          lwd = coords$stroke * .stroke / 2
+        )
+      )
+    )
+  }
 )
 
-library(ggplot2)
-library(dplyr)
-xxx <- eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv"))
+### geom_timeline_label --------------------------------------------------------
+
+geom_timeline_label <-
+  function(mapping = NULL,
+           data = NULL,
+           stat = "identity",
+           position = "identity",
+           na.rm = FALSE,
+           show.legend = NA,
+           inherit.aes = TRUE,
+           ...) {
+    ggplot2::layer(
+      geom = GeomTimelineLabel,
+      mapping = mapping,
+      data = data,
+      stat = stat,
+      position = position,
+      show.legend = show.legend,
+      inherit.aes = inherit.aes,
+      params = list(na.rm = na.rm, ...)
+    )
+  }
+
+GeomTimelineLabel <-
+  ggplot2::ggproto(
+    "GeomTimelineLabel",
+    ggplot2::Geom,
+    required_aes = c("x", "label"),
+    default_aes = ggplot2::aes(n_max = NA),
+    setup_data = function(data, params) {
+      n <- data$n_max[1]
+      if (is.numeric(n)) {
+        dplyr::top_n(dplyr::group_by_(data, "group"), n, size)
+      } else {
+        data
+      }
+    },
+    draw_panel = function(data, panel_scales, coord) {
+      coords <- coord$transform(data, panel_scales)
+      grid::grobTree(
+        grid::segmentsGrob(
+          x0 = coords$x,
+          y0 = coords$y,
+          x1 = coords$x,
+          y1 = coords$y + 0.1,
+          gp = grid::gpar()
+        ),
+        grid::textGrob(
+          x = coords$x,
+          y = coords$y + 0.1,
+          label = coords$label,
+          rot = 45,
+          hjust = -0.1,
+          vjust = -0.1,
+          gp = grid::gpar()
+        )
+      )
+    }
+  )
+
+
+
+xxx = read.table(file = "earthquakes-2020-10-19_15-21-05_+0300.tsv", sep = '\t', header = TRUE)
+xxx <- eq_clean_data(xxx) %>%
+  dplyr::filter(lubridate::year(DATE) >= 2020 & !is.na(Total.Deaths))
+
 
 xxx %>%
-dplyr::filter(lubridate::year(DATE) >= 2019 & !is.na(Total.Deaths)) %>%
-ggplot(aes(x=DATE,color=Total.Deaths, size = Total.Deaths)) +
-geom_timeline(alpha=.5)
+ggplot(aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
+geom_timeline(alpha=.5) +
+geom_timeline_label(aes(label = LOCATION_NAME, n_max = 5))
+
 
 
 
