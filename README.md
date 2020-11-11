@@ -14,8 +14,6 @@ https://github.com/davidbody/earthquakes-package
 * eq_clean_data() annotations
 * eq_location_clean() annotations
 * eq_country_clean() annotations
-* eq_map()
-* eq_create_label() 
 * eq_map() annotations
 * eq_create_label() annotations
 * DESCRIPTION, LICENSE, NAMESPACE, and README.md file.
@@ -27,6 +25,8 @@ https://github.com/davidbody/earthquakes-package
 
 
 #### Done
+* eq_map()
+* eq_create_label() 
 * geom_timeline_label() 
 * geom_timeline() 
 * eq_clean_data()

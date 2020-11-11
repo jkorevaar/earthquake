@@ -58,6 +58,17 @@ eq_location_clean <- function(location) {
   return(location)
 }
 
+### eq_country_clean ----------------------------------------------------------
+
+#' eq_location_clean
+#' cleans location column
+#' @param data the data that is returned from eq_clean_data
+#' @return returns a data file where location is -a- trimmed of ws -b- converted
+#' to title case -c- name of country removed
+#' @importFrom stringr str_to_title
+#' @examples
+#' eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv"))
+
 eq_country_clean <- function(location) {
   location = gsub(":.*","",location)
   location = stringr::str_to_title(trimws(location))
@@ -185,6 +196,48 @@ GeomTimelineLabel <-
       )
     }
   )
+
+
+### eq_map  ------------------------------------------------------------------
+
+readr::read_delim("earthquakes-2020-10-19_15-21-05_+0300.tsv", delim = "\t") %>%
+  eq_clean_data() %>%
+  dplyr::filter(COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000) %>%
+  eq_map(annot_col = "DATE")
+
+eq_map = function(data, annot_col){
+  map = addTiles(leaflet())
+  map = addCircleMarkers(
+                     map
+                     ,data = data
+                     ,lng = ~Longitude
+                     ,lat = ~Latitude
+                     ,radius = ~Mag*2
+                     ,weight = 1
+                     ,popup = data[, annot_col])
+  return(map)
+}
+
+### eq_create_label ------------------------------------------------------------
+
+readr::read_delim("earthquakes-2020-10-19_15-21-05_+0300.tsv", delim = "\t") %>%
+  eq_clean_data() %>%
+  dplyr::filter(COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000) %>%
+  dplyr::mutate(popup_text = eq_create_label(.)) %>%
+  eq_map(annot_col = "popup_text")
+
+eq_create_label <- function(df) {
+  paste(sep = "<br/>"
+        ,paste("<b>Location:</b>", df$LOCATION_NAME)
+        ,paste("<b>Magnitude:</b>", df$Mag)
+        ,paste("<b>Total deaths:</b>", df$Total.Deaths)
+  )
+}
+
+
+
+
+
 
 
 
