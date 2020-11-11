@@ -9,13 +9,6 @@ https://github.com/davidbody/earthquakes-package
 # workflow
 
 #### To Do
-* geom_timeline_label() annotations
-* geom_timeline() annotations
-* eq_clean_data() annotations
-* eq_location_clean() annotations
-* eq_country_clean() annotations
-* eq_map() annotations
-* eq_create_label() annotations
 * DESCRIPTION, LICENSE, NAMESPACE, and README.md file.
 * Vignette
 * Help Files 
@@ -25,6 +18,13 @@ https://github.com/davidbody/earthquakes-package
 
 
 #### Done
+* geom_timeline_label() annotations
+* geom_timeline() annotations
+* eq_map() annotations
+* eq_create_label() annotations
+* eq_clean_data() annotations
+* eq_location_clean() annotations
+* eq_country_clean() annotations
 * eq_map()
 * eq_create_label() 
 * geom_timeline_label() 
@@ -32,3 +32,5 @@ https://github.com/davidbody/earthquakes-package
 * eq_clean_data()
 * eq_location_clean()
 * eq_country_clean()
+* devtools::create()
+

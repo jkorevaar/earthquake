@@ -6,20 +6,20 @@
 
 #' eq_clean_data
 #' loads earthquake data.
-#' @param filename Name of the file containing earthquake data
+#' @param earthquakes the file that contains the earthquake data
 #' @return Returns earthquake data with the following cleaning -a- added 01 for
-#' empty months and days -b- removed dates in bc -c- created a DATE column with
-#' date format -d- turned long and lat to numerics
+#' empty months and days and years -b- removed dates in bc -c- created a DATE
+#' column with date format -d- turned long and lat to numeric -d- use functions
+#' to clean Location Names and Country Names
+#' @importFrom readr read_delim
 #' @examples
 #' eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 
-eq_clean_data <- function(earthquakes) {
-
+eq_clean_data <- function(filename) {
+  earthquakes <- readr::read_delim(filename, delim = "\t")
   #delete first row - empty result - and first column - empty col
   earthquakes = earthquakes[-1, -1]
-
   result <- data.frame(earthquakes)
-
   #fill empty data data
   result$Mo[is.na(data$Mo)] = 01
   result$Dy[is.na(data$Dy)] = 01
@@ -29,10 +29,8 @@ eq_clean_data <- function(earthquakes) {
                                           result$Mo,
                                           result$Dy,
                                         sep="-"), "%Y-%m-%d"))
-
   # filter out BC
   result = result[!is.na(result$DATE), ]
-
   LATITUDE <- as.numeric(result$Latitude)
   result$LONGITUDE <- as.numeric(result$Longitude)
   result$TOTAL_DEATHS <- as.numeric(result$Total.Deaths)
@@ -44,38 +42,54 @@ eq_clean_data <- function(earthquakes) {
 ### eq_location_clean ----------------------------------------------------------
 
 #' eq_location_clean
-#' cleans location column
-#' @param data the data that is returned from eq_clean_data
+#' cleans location column and removes country data
+#' @param loc_col the column that holds the location data
 #' @return returns a data file where location is -a- trimmed of ws -b- converted
 #' to title case -c- name of country removed
 #' @importFrom stringr str_to_title
 #' @examples
-#' eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv"))
+#'eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#'eq$LOCATION_NAME = eq_location_clean(eq$Location.Name)
 
-eq_location_clean <- function(location) {
-  location = gsub(".*:","",location)
-  location = stringr::str_to_title(trimws(location))
-  return(location)
+eq_location_clean <- function(loc_col) {
+  loc_col = gsub(".*:","",loc_col)
+  loc_col = stringr::str_to_title(trimws(loc_col))
+  return(loc_col)
 }
 
 ### eq_country_clean ----------------------------------------------------------
 
-#' eq_location_clean
-#' cleans location column
-#' @param data the data that is returned from eq_clean_data
+#' eq_country_clean
+#' cleans location column only leaving the country
+#' @param loc_col the column that holds the location data
 #' @return returns a data file where location is -a- trimmed of ws -b- converted
 #' to title case -c- name of country removed
 #' @importFrom stringr str_to_title
 #' @examples
-#' eq_location_clean(eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv"))
+#'eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#'eq$LOCATION_NAME = eq_country_clean(eq$Location.Name)
 
-eq_country_clean <- function(location) {
-  location = gsub(":.*","",location)
-  location = stringr::str_to_title(trimws(location))
-  return(location)
+eq_country_clean <- function(loc_col) {
+  loc_col = gsub(":.*","",loc_col)
+  loc_col = stringr::str_to_title(trimws(loc_col))
+  return(loc_col)
 }
 
 ### geom_timeline --------------------------------------------------------------
+
+#' geom_timeline
+#' plots a time line of earthquakes with a point for each earthwquake. x axis is
+#' date and y axis is a factor
+#' @param data The earthquake data to be plotted. See the example for details.
+#' @return ggplot2 graphical object of earthquakes
+#' @import ggplot2
+#' @import dplyr
+#' @examples
+#' library(ggplot2)
+#' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#' eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
+#' ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
+#'   geom_timeline(alpha=.5)
 
 geom_timeline <-
   function(mapping = NULL,
@@ -139,6 +153,21 @@ GeomTimeline <- ggplot2::ggproto(
 
 ### geom_timeline_label --------------------------------------------------------
 
+#' geom_timeline
+#' This geom is intended to be used in conjunction with the geom_timeline geom
+#' to add a vertical line with a text annotation
+#' @param data The earthquake data to be plotted. See the example for details.
+#' @return ggplot2 graphical object of earthquakes
+#' @import ggplot2
+#' @import dplyr
+#' @examples
+#' library(ggplot2)
+#' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#' eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
+#' ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
+#'   geom_timeline(alpha=.5) +
+#'   geom_timeline_label(aes(label = LOCATION_NAME, n_max = 5))
+
 geom_timeline_label <-
   function(mapping = NULL,
            data = NULL,
@@ -200,10 +229,18 @@ GeomTimelineLabel <-
 
 ### eq_map  ------------------------------------------------------------------
 
-readr::read_delim("earthquakes-2020-10-19_15-21-05_+0300.tsv", delim = "\t") %>%
-  eq_clean_data() %>%
-  dplyr::filter(COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000) %>%
-  eq_map(annot_col = "DATE")
+#' eq_map
+#' Produces a map of earthquake epicenters and annotates
+#' each point with a popup window
+#' @param data The earthquake data to be plotted. See the example for details.
+#' @param annot_col the column that contains the annotations
+#' @return leaflet object with earthquake data
+#' @import leaflet
+#' @examples
+#' library(dplyr)
+#' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#' eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
+#' eq_map(eq, annot_col = "COUNTRY")
 
 eq_map = function(data, annot_col){
   map = addTiles(leaflet())
@@ -220,11 +257,15 @@ eq_map = function(data, annot_col){
 
 ### eq_create_label ------------------------------------------------------------
 
-readr::read_delim("earthquakes-2020-10-19_15-21-05_+0300.tsv", delim = "\t") %>%
-  eq_clean_data() %>%
-  dplyr::filter(COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000) %>%
-  dplyr::mutate(popup_text = eq_create_label(.)) %>%
-  eq_map(annot_col = "popup_text")
+#' eq_create_label
+#' produces a column in the earthquake data that contains the information
+#' necessary for a popu-up - location, magnitude, total deaths
+#' @param data The earthquake dataframe
+#' @return string with labels for the popup
+#' @examples
+#' library(dplyr)
+#' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#' eq = dplyr::mutate(eq, popup_text = eq_create_label(eq))
 
 eq_create_label <- function(df) {
   paste(sep = "<br/>"
@@ -233,24 +274,5 @@ eq_create_label <- function(df) {
         ,paste("<b>Total deaths:</b>", df$Total.Deaths)
   )
 }
-
-
-
-
-
-
-
-
-xxx = read.table(file = "earthquakes-2020-10-19_15-21-05_+0300.tsv", sep = '\t', header = TRUE)
-xxx <- eq_clean_data(xxx) %>%
-  dplyr::filter(lubridate::year(DATE) >= 2020 & !is.na(Total.Deaths))
-
-
-xxx %>%
-ggplot(aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
-geom_timeline(alpha=.5) +
-geom_timeline_label(aes(label = LOCATION_NAME, n_max = 5))
-
-
 
 
