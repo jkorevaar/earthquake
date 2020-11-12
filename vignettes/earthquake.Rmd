@@ -1,13 +1,23 @@
 ---
-title: "Earthquakes Package"
-author: "Jan Korevaar"
-date: "`r Sys.Date()`"
+title: "earthquake"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{earthquak}
+  %\VignetteIndexEntry{earthquake}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(earthquake)
+```
+
 
 # Earthquake package
 
@@ -16,10 +26,6 @@ The functions provided by this package use data from the [U.S. National Oceanogr
 ## sample data
 
 The following is the data included in the package
-
-```{r}
-library(earthquake)
-```
 
 
 ```{r, message=FALSE}
@@ -39,21 +45,21 @@ to create the country column
 country removed. 
 
 ```{r}
-eq_location_clean("ITALY: VERONA")
+earthquake:::eq_location_clean("Canada:Toronto")
 ```
 
 `eq_country_clean` returns a title case character string with the only the 
 location's country remaining
 
 ```{r}
-eq_location_clean("ITALY: VERONA")
+earthquake:::eq_country_clean("Canada:Toronto")
 ```
 
 You can create a `clean_earthquakes` data frame like this:
 
 ```{r, message=FALSE}
 library(dplyr)
-clean_earthquakes <- eq_clean_data(earthquakes)
+clean_earthquakes <- earthquake:::eq_clean_data(earthquakes)
 ```
 
 ## Geoms for earthquake time line

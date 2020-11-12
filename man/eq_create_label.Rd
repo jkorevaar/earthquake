@@ -9,7 +9,7 @@ necessary for a popu-up - location, magnitude, total deaths}
 eq_create_label(df)
 }
 \arguments{
-\item{data}{The earthquake dataframe}
+\item{df}{The earthquake dataframe}
 }
 \value{
 string with labels for the popup
@@ -20,8 +20,10 @@ produces a column in the earthquake data that contains the information
 necessary for a popu-up - location, magnitude, total deaths
 }
 \examples{
+\dontrun{
 library(dplyr)
 eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 eq = dplyr::mutate(eq, popup_text = eq_create_label(eq))
 eq_map(eq, annot_col = "popup_text")
+}
 }

@@ -5,7 +5,7 @@
 \title{eq_clean_data
 loads earthquake data.}
 \usage{
-eq_clean_data(filename)
+eq_clean_data(earthquakes)
 }
 \arguments{
 \item{earthquakes}{the file that contains the earthquake data}
@@ -21,5 +21,9 @@ eq_clean_data
 loads earthquake data.
 }
 \examples{
-eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+\dontrun{
+earthquakes <- readr::read_delim("earthquakes-2020-10-19_15-21-05_+0300.tsv",
+delim = "\t")
+eq_clean_data(earthquakes)
+}
 }

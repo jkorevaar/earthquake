@@ -18,7 +18,21 @@ geom_timeline_label(
 )
 }
 \arguments{
+\item{mapping}{mapping}
+
 \item{data}{The earthquake data to be plotted. See the example for details.}
+
+\item{stat}{stat}
+
+\item{position}{position}
+
+\item{na.rm}{na.rm}
+
+\item{show.legend}{show.legend}
+
+\item{...}{...}
+
+\item{inherit.as}{inherit.as}
 }
 \value{
 ggplot2 graphical object of earthquakes
@@ -29,10 +43,12 @@ This geom is intended to be used in conjunction with the geom_timeline geom
 to add a vertical line with a text annotation
 }
 \examples{
+\dontrun{
 library(ggplot2)
 eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
 ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
   geom_timeline(alpha=.5) +
   geom_timeline_label(aes(label = LOCATION_NAME, n_max = 5))
+}
 }

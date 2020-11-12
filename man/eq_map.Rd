@@ -22,8 +22,10 @@ Produces a map of earthquake epicenters and annotates
 each point with a popup window
 }
 \examples{
+\dontrun{
 library(dplyr)
 eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
 eq_map(eq, annot_col = "COUNTRY")
+}
 }

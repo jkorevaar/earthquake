@@ -19,6 +19,7 @@ eq_location_clean
 cleans location column and removes country data
 }
 \examples{
-eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
-eq$LOCATION_NAME = eq_location_clean(eq$Location.Name)
+\dontrun{
+eq_location_clean("Canada:Toronto")
+}
 }

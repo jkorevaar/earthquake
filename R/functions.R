@@ -2,6 +2,11 @@
 # Course - Mastering Software Development in R Capstone
 # Last Edited 20/10/2020
 
+### testing
+#earthquakes <- readr::read_delim(filename, delim = "\t")
+#eq_clean_data(earthquakes)
+
+
 ### eq_clean_data --------------------------------------------------------------
 
 #' eq_clean_data
@@ -13,17 +18,19 @@
 #' to clean Location Names and Country Names
 #' @importFrom readr read_delim
 #' @examples
-#' eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
+#' \dontrun{
+#' earthquakes <- readr::read_delim("earthquakes-2020-10-19_15-21-05_+0300.tsv",
+#' delim = "\t")
+#' eq_clean_data(earthquakes)
+#' }
+#' @export
 
-eq_clean_data <- function(filename) {
-  earthquakes <- readr::read_delim(filename, delim = "\t")
-  #delete first row - empty result - and first column - empty col
-  earthquakes = earthquakes[-1, -1]
+eq_clean_data <- function(earthquakes) {
   result <- data.frame(earthquakes)
   #fill empty data data
-  result$Mo[is.na(data$Mo)] = 01
-  result$Dy[is.na(data$Dy)] = 01
-  result$Year[is.na(data$Year)] = 01
+  result$Mo[is.na(result$Mo)] = 01
+  result$Dy[is.na(result$Dy)] = 01
+  result$Year[is.na(result$Year)] = 01
   #create date column
   result$DATE = as.POSIXct(strptime(paste(result$Year,
                                           result$Mo,
@@ -48,8 +55,10 @@ eq_clean_data <- function(filename) {
 #' to title case -c- name of country removed
 #' @importFrom stringr str_to_title
 #' @examples
-#'eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
-#'eq$LOCATION_NAME = eq_location_clean(eq$Location.Name)
+#' \dontrun{
+#' eq_location_clean("Canada:Toronto")
+#' }
+#' @export
 
 eq_location_clean <- function(loc_col) {
   loc_col = gsub(".*:","",loc_col)
@@ -66,8 +75,10 @@ eq_location_clean <- function(loc_col) {
 #' to title case -c- name of country removed
 #' @importFrom stringr str_to_title
 #' @examples
-#'eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
-#'eq$LOCATION_NAME = eq_country_clean(eq$Location.Name)
+#' \dontrun{
+#' eq_country_clean("Canada:Toronto")
+#' }
+#' @export
 
 eq_country_clean <- function(loc_col) {
   loc_col = gsub(":.*","",loc_col)
@@ -81,15 +92,26 @@ eq_country_clean <- function(loc_col) {
 #' plots a time line of earthquakes with a point for each earthwquake. x axis is
 #' date and y axis is a factor
 #' @param data The earthquake data to be plotted. See the example for details.
+#' @param mapping mapping
+#' @param stat stat
+#' @param position position
+#' @param na.rm na.rm
+#' @param show.legend show.legend
+#' @param inherit.as inherit.as
+#' @param ... ...
 #' @return ggplot2 graphical object of earthquakes
 #' @import ggplot2
 #' @import dplyr
+#' @import lubridate
 #' @examples
+#' \dontrun{
 #' library(ggplot2)
 #' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 #' eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
 #' ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
 #'   geom_timeline(alpha=.5)
+#' }
+#' @export
 
 geom_timeline <-
   function(mapping = NULL,
@@ -157,16 +179,26 @@ GeomTimeline <- ggplot2::ggproto(
 #' This geom is intended to be used in conjunction with the geom_timeline geom
 #' to add a vertical line with a text annotation
 #' @param data The earthquake data to be plotted. See the example for details.
+#' @param mapping mapping
+#' @param stat stat
+#' @param position position
+#' @param na.rm na.rm
+#' @param show.legend show.legend
+#' @param inherit.as inherit.as
+#' @param ... ...
 #' @return ggplot2 graphical object of earthquakes
 #' @import ggplot2
 #' @import dplyr
 #' @examples
+#' \dontrun{
 #' library(ggplot2)
 #' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 #' eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
 #' ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
 #'   geom_timeline(alpha=.5) +
 #'   geom_timeline_label(aes(label = LOCATION_NAME, n_max = 5))
+#' }
+#' @export
 
 geom_timeline_label <-
   function(mapping = NULL,
@@ -237,10 +269,13 @@ GeomTimelineLabel <-
 #' @return leaflet object with earthquake data
 #' @import leaflet
 #' @examples
+#' \dontrun{
 #' library(dplyr)
 #' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 #' eq = dplyr::filter(eq, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
 #' eq_map(eq, annot_col = "COUNTRY")
+#' }
+#' @export
 
 eq_map = function(data, annot_col){
   map = addTiles(leaflet())
@@ -260,13 +295,16 @@ eq_map = function(data, annot_col){
 #' eq_create_label
 #' produces a column in the earthquake data that contains the information
 #' necessary for a popu-up - location, magnitude, total deaths
-#' @param data The earthquake dataframe
+#' @param df The earthquake dataframe
 #' @return string with labels for the popup
 #' @examples
+#' \dontrun{
 #' library(dplyr)
 #' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 #' eq = dplyr::mutate(eq, popup_text = eq_create_label(eq))
 #' eq_map(eq, annot_col = "popup_text")
+#' }
+#' @export
 
 eq_create_label <- function(df) {
   paste(sep = "<br/>"
