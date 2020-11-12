@@ -1,4 +1,19 @@
-# earthquake
+# earthquake package
+
+The functions provided by this package use data from the U.S. National Oceanographic and Atmospheric Administration (NOAA) Significant Earthquake Database.
+
+According the requirements of project, following functions are available:
+
+Data tidying functions:
+eq_get_data
+eq_clean_data
+eq_location_clean
+eq_map
+Geom for creating visualisations:
+geom_timeline
+geom_timeline_label
+
+
 
 #helpful sources
 
@@ -10,14 +25,14 @@ https://github.com/davidbody/earthquakes-package
 
 #### To Do
 * DESCRIPTION, LICENSE, NAMESPACE, and README.md file.
-* Vignette
-* Help Files 
 * Tests (testthat)
 * Travis CI Test + Badge on Read.me
 
 
 
 #### Done
+* Vignette
+* Help Files 
 * geom_timeline_label() annotations
 * geom_timeline() annotations
 * eq_map() annotations

@@ -17,8 +17,13 @@ The functions provided by this package use data from the [U.S. National Oceanogr
 
 The following is the data included in the package
 
+```{r}
+library(earthquake)
+```
+
+
 ```{r, message=FALSE}
-filename <- system.file("extdata", "earthquakes-2020-10-19_15-21-05_+0300.tsv", package = "earthquak")
+filename <- system.file("extdata", "earthquakes-2020-10-19_15-21-05_+0300.tsv", package = "earthquake")
 earthquakes <- readr::read_delim(filename, delim = "\t")
 ```
 
