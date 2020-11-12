@@ -19,10 +19,10 @@ geom_timeline_label
 # workflow
 
 #### To Do
-* Travis Badge on Read.me
-* Travis CI Test 
 
 #### Done
+* Travis Badge on Read.me
+* Travis CI Test 
 * LICENSE
 * Tests (testthat)
 * Vignette
