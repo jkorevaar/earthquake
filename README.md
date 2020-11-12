@@ -25,12 +25,12 @@ https://github.com/davidbody/earthquakes-package
 
 #### To Do
 * LICENSE
-* Tests (testthat)
 * Travis CI Test + Badge on Read.me
 
 
 
 #### Done
+* Tests (testthat)
 * Vignette
 * DESCRIPTION, NAMESPACE, and README.md file.
 * Help Files 
