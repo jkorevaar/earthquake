@@ -24,16 +24,15 @@ https://github.com/davidbody/earthquakes-package
 # workflow
 
 #### To Do
-* Vignette
-
+* LICENSE
 * Tests (testthat)
 * Travis CI Test + Badge on Read.me
 
 
 
 #### Done
-* DESCRIPTION, LICENSE, NAMESPACE, and README.md file.
-
+* Vignette
+* DESCRIPTION, NAMESPACE, and README.md file.
 * Help Files 
 * geom_timeline_label() annotations
 * geom_timeline() annotations
