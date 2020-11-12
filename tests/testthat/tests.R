@@ -20,13 +20,15 @@ testthat::test_that("eq_clean_data returns a data frame", {
 })
 
 testthat::test_that("geom_timline is a geom", {
-  geom <- ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
+  clean_data <- eq_clean_data(earthquakes)
+  geom <- ggplot2::ggplot(clean_data,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
     geom_timeline(alpha=.5)
   testthat::expect_is(geom, "ggplot")
 })
 
 testthat::test_that("geom_timline w/ geom_timeline_label is a geom", {
-  geom <- ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
+  clean_data <- eq_clean_data(earthquakes)
+  geom <- ggplot2::ggplot(clean_data,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
     geom_timeline(alpha=.5) +
     geom_timeline_label(aes(label = LOCATION_NAME, n_max = 5))
   testthat::expect_is(geom, "ggplot")

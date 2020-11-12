@@ -97,7 +97,7 @@ eq_country_clean <- function(loc_col) {
 #' @param position position
 #' @param na.rm na.rm
 #' @param show.legend show.legend
-#' @param inherit.as inherit.as
+#' @param inherit.aes inherit.as
 #' @param ... ...
 #' @return ggplot2 graphical object of earthquakes
 #' @import ggplot2
@@ -184,7 +184,7 @@ GeomTimeline <- ggplot2::ggproto(
 #' @param position position
 #' @param na.rm na.rm
 #' @param show.legend show.legend
-#' @param inherit.as inherit.as
+#' @param inherit.aes inherit.aes
 #' @param ... ...
 #' @return ggplot2 graphical object of earthquakes
 #' @import ggplot2

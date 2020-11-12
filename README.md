@@ -24,12 +24,12 @@ https://github.com/davidbody/earthquakes-package
 # workflow
 
 #### To Do
-* LICENSE
 * Travis CI Test + Badge on Read.me
 
 
 
 #### Done
+* LICENSE
 * Tests (testthat)
 * Vignette
 * DESCRIPTION, NAMESPACE, and README.md file.

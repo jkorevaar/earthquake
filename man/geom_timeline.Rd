@@ -30,9 +30,9 @@ geom_timeline(
 
 \item{show.legend}{show.legend}
 
-\item{...}{...}
+\item{inherit.aes}{inherit.as}
 
-\item{inherit.as}{inherit.as}
+\item{...}{...}
 }
 \value{
 ggplot2 graphical object of earthquakes
