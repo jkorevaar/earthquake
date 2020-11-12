@@ -24,9 +24,8 @@ https://github.com/davidbody/earthquakes-package
 # workflow
 
 #### To Do
-* Travis CI Test + Badge on Read.me
-
-
+* Travis Badge on Read.me
+* Travis CI Test 
 
 #### Done
 * LICENSE

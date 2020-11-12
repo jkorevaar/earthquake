@@ -7,8 +7,8 @@ Authors@R:
            family = "Korevaar",
            role = c("aut", "cre"),
            email = "jn.korevaar@gmail.com")
-Description: This package reads, cleans, graphs, and maps earthquake data from the NOAA earthwquake dataset. For couurse Mastering Software Development in R on Coursera
-License: GPL-3
+Description: This package reads, cleans, graphs, and maps earthquake data from the NOAA earthwquake dataset. For couurse Mastering Software Development in R on Coursera.
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
