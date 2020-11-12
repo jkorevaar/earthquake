@@ -266,6 +266,7 @@ eq_map = function(data, annot_col){
 #' library(dplyr)
 #' eq = eq_clean_data("earthquakes-2020-10-19_15-21-05_+0300.tsv")
 #' eq = dplyr::mutate(eq, popup_text = eq_create_label(eq))
+#' eq_map(eq, annot_col = "popup_text")
 
 eq_create_label <- function(df) {
   paste(sep = "<br/>"

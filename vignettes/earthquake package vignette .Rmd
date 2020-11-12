@@ -1,0 +1,110 @@
+---
+title: "Earthquakes Package"
+author: "Jan Korevaar"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{earthquak}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Earthquake package
+
+The functions provided by this package use data from the [U.S. National Oceanographic and Atmospheric Administration (NOAA)](https://www.ngdc.noaa.gov/nndc/struts/form?t=101650&s=1&d=1) Significant Earthquake Database. 
+
+## sample data
+
+The following is the data included in the package
+
+```{r, message=FALSE}
+filename <- system.file("extdata", "earthquakes-2020-10-19_15-21-05_+0300.tsv", package = "earthquak")
+earthquakes <- readr::read_delim(filename, delim = "\t")
+```
+
+## Functions for cleaning the data
+
+There are three functions for cleaning the earthquakes data.
+
+`eq_clean_data` adds a `DATE` column and cleans `LOCATION_NAME` by using the 
+`eq_location_clean` function to create the location column and the `eq_country_clean`
+to create the country column
+
+`eq_location_clean` returns a title case character string with the location's 
+country removed. 
+
+```{r}
+eq_location_clean("ITALY: VERONA")
+```
+
+`eq_country_clean` returns a title case character string with the only the 
+location's country remaining
+
+```{r}
+eq_location_clean("ITALY: VERONA")
+```
+
+You can create a `clean_earthquakes` data frame like this:
+
+```{r, message=FALSE}
+library(dplyr)
+clean_earthquakes <- eq_clean_data(earthquakes)
+```
+
+## Geoms for earthquake time line
+
+This package contains two `ggplot2` geoms for plotting earthquake time lines.
+
+### geom_timeline
+
+`geom_timeline` plots a time line of earthquakes with a point for each earthquake. The `x` axis is a date and the `y` aesthetic is a factor (e.g. country). Optional aesthetics include `color`, `size`, and `alpha`.
+
+Here is an example:
+
+```{r, fig.show="hold", fig.width=7, message=FALSE}
+library(ggplot2)
+
+eq = dplyr::filter(clean_earthquakes, COUNTRY == "Mexico" & lubridate::year(DATE) >= 2000)
+
+ggplot2::ggplot(eq,aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
+  geom_timeline(alpha=.5)
+```
+
+### geom_timeline_label
+
+This geom is intended to be used together with the `geom_timeline` geom to add a vertical line with an annotation for each data point on an earthquake timeline. The `x` aesthetic specifies the date, the`label` aesthetic specifies the label for the annotation.
+
+Here is an example:
+
+```{r, fig.width=7, fig.height=7}
+
+ggplot2::ggplot(eq, aes(x=DATE,y = COUNTRY, color = TOTAL_DEATHS, size = TOTAL_DEATHS)) +
+  geom_timeline(alpha=.5)+
+  geom_timeline_label(aes(label = LOCATION_NAME, n_max = 5))
+```
+
+## Mapping functions
+
+### eq_map
+
+The `eq_map` function produces a map of earthquake epicenters (LATITUDE/LONGITUDE) and annotates each point with a popup window containing annotation data stored in a column of the data frame. The radius of each circle is proportional to the earthquake's magnitude (EQ_PRIMARY).
+
+Here is an example:
+
+```{r, fig.width=7, fig.height=7}
+eq_map(eq, annot_col = "COUNTRY")
+```
+
+### eq_create_label
+
+This function creates HTML labels with location, magnitude, and total deaths for each earthquake.
+
+Here is an example:
+
+```{r, fig.width=7, fig.height=7}
+eq = dplyr::mutate(eq, popup_text = eq_create_label(eq))
+eq_map(eq, annot_col = "popup_text")
+```
+
+
+
