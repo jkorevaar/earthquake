@@ -1,5 +1,7 @@
 # earthquake package
 
+[![Build Status](https://travis-ci.org/jkorevaar/earthquake.svg?branch=main)](https://travis-ci.org/jkorevaar/earthquake)
+
 The functions provided by this package use data from the U.S. National Oceanographic and Atmospheric Administration (NOAA) Significant Earthquake Database.
 
 According the requirements of project, following functions are available:
@@ -12,13 +14,6 @@ eq_map
 Geom for creating visualisations:
 geom_timeline
 geom_timeline_label
-
-
-
-#helpful sources
-
-https://github.com/Grandez/earthquake
-https://github.com/davidbody/earthquakes-package
 
 
 # workflow
